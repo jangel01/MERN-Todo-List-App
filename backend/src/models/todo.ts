@@ -1,15 +1,20 @@
 import { InferSchemaType, Schema, model } from "mongoose";
 
+const taskSchema = new Schema({
+    description: { type: String },
+    completed: { type: Boolean, default: false },
+});
+
+const sectionSchema = new Schema({
+    name: { type: String },
+    tasks: [taskSchema],
+});
+
 const todoSchema = new Schema({
     name: { type: String, required: true },
-    sections: [{
-        name: { type: String },
-        tasks: [{
-            description: { type: String },
-            completed: { type: Boolean, default: false },
-        }]
-    }]
+    sections: [sectionSchema],
 }, { timestamps: true });
+
 
 type Todo = InferSchemaType<typeof todoSchema>;
 
