@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import { Todo as TodoModel } from './models/todo';
 import TodoConfigure from './components/todoConfigure';
+import AddEditTodoDialog from './components/AddEditTodoDialog';
 
 function App() {
   const [todos, setTodos] = useState<TodoModel[]>([]);
   const [selectedTodo, setSelectedTodo] = useState<TodoModel | null>(null);
+
+  const [showTodoDialog, setShowTodoDialog] = useState(false);
 
   useEffect(() => {
     async function loadTodos() {
@@ -15,7 +18,7 @@ function App() {
         setTodos(todos);
 
         if (todos.length > 0) {
-          handleTodoSelect(todos[0]);
+          setSelectedTodo(todos[0]);
         }
       } catch (error) {
         console.error(error);
@@ -26,13 +29,17 @@ function App() {
     loadTodos();
   }, []);
 
-  const handleTodoSelect = (todo: TodoModel) => {
-    setSelectedTodo(todo);
-  }
-
   return (
     <div className="App">
-      <TodoConfigure todos={todos} onSelect={handleTodoSelect} />
+      <TodoConfigure todos={todos} onSelect={(todo) => setSelectedTodo(todo)} onNewTodoClicked={() => setShowTodoDialog(true)} />
+
+      {showTodoDialog && <AddEditTodoDialog
+        onDismiss={() => setShowTodoDialog(false)}
+        onTodoSaved={(newTodo) => {
+          setTodos([...todos, newTodo])
+          setShowTodoDialog(false)
+        }}
+      />}
 
       {selectedTodo && (
         <div>
@@ -51,8 +58,9 @@ function App() {
           ))}
         </div>
       )}
+
     </div>
   );
-}
+};
 
 export default App;
