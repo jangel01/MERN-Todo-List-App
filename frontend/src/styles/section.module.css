@@ -1,0 +1,18 @@
+.todoCard {
+    background-color: cornsilk;
+}
+
+.headerContainer {
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.iconsContainer {
+    display: flex;
+}
+
+.icon {
+    padding-right:3px;
+}
+

@@ -39,3 +39,22 @@ export async function updateTodo(todoId: string, todo: TodoInput): Promise<TodoM
 
     return response.json();
 }
+
+export interface SectionInput {
+    name?: string,
+}
+
+export async function createSection(todoId: string, section: SectionInput) {
+    const response = await fetchData("/api/todos/" + todoId + "/sections/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(section),
+    });
+
+    return response.json();
+}
+
+
+

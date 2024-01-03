@@ -120,7 +120,10 @@ export const createSection: RequestHandler<TodoInterfaces.CreateSectionParams, u
             throw createHttpError(404, "Could not create section: todo not found");
         }
 
-        res.status(201).json(updatedTodo);
+        const newSectionId = updatedTodo.sections[updatedTodo.sections.length - 1]._id;
+        const newSection = updatedTodo.sections.find(section => section._id?.equals(newSectionId));
+
+        res.status(201).json(newSection);
     } catch (error) {
         next(error);
     }
