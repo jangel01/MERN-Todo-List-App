@@ -8,7 +8,8 @@ function App() {
   const [todos, setTodos] = useState<TodoModel[]>([]);
   const [selectedTodo, setSelectedTodo] = useState<TodoModel | null>(null);
 
-  const [showTodoDialog, setShowTodoDialog] = useState(false);
+  const [showAddTodoDialog, setShowAddTodoDialog] = useState(false);
+  const [showEditTodoDialog, setShowEditTodoDialog] = useState(false);
 
   useEffect(() => {
     async function loadTodos() {
@@ -31,13 +32,24 @@ function App() {
 
   return (
     <div className="App">
-      <TodoConfigure todos={todos} onSelect={(todo) => setSelectedTodo(todo)} onNewTodoClicked={() => setShowTodoDialog(true)} />
+      <TodoConfigure selectedTodo = {selectedTodo} todos={todos} onSelect={(todo) => setSelectedTodo(todo)} onNewTodoClicked={() => setShowAddTodoDialog(true)} onEditTodoClicked={() => setShowEditTodoDialog(true)} />
 
-      {showTodoDialog && <AddEditTodoDialog
-        onDismiss={() => setShowTodoDialog(false)}
+      {showAddTodoDialog && <AddEditTodoDialog
+        onDismiss={() => setShowAddTodoDialog(false)}
         onTodoSaved={(newTodo) => {
-          setTodos([...todos, newTodo])
-          setShowTodoDialog(false)
+          setTodos([...todos, newTodo]);
+          setSelectedTodo(newTodo);
+          setShowAddTodoDialog(false);
+        }}
+      />}
+
+      {selectedTodo && showEditTodoDialog && <AddEditTodoDialog
+        todoToEdit={selectedTodo}
+        onDismiss={() => setShowEditTodoDialog(false)}
+        onTodoSaved={(updatedTodo) => {
+          setTodos(todos.map(existingTodo => existingTodo._id === updatedTodo._id ? updatedTodo : existingTodo));
+          setSelectedTodo(updatedTodo);
+          setShowEditTodoDialog(false)
         }}
       />}
 

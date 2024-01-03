@@ -7,7 +7,7 @@ import TextInputField from "./form/TextInputField";
 
 
 interface AddEditTodoDialogProps {
-    todoToEdit?: TodoModel,
+    todoToEdit?: TodoModel | null,
     onDismiss: () => void,
     onTodoSaved: (Todo: TodoModel) => void,
 }
@@ -23,7 +23,11 @@ const AddEditTodoDialog = ({todoToEdit, onDismiss, onTodoSaved}: AddEditTodoDial
         try {
             let todoResponse: TodoModel;
 
-            todoResponse = await TodosApi.createTodo(input);
+            if (todoToEdit) {
+                todoResponse = await TodosApi.updateTodo(todoToEdit._id, input);
+            } else {
+                todoResponse = await TodosApi.createTodo(input);
+            }
 
             onTodoSaved(todoResponse);
         } catch (error) {
@@ -35,7 +39,7 @@ const AddEditTodoDialog = ({todoToEdit, onDismiss, onTodoSaved}: AddEditTodoDial
         <Modal show onHide={onDismiss}>
             <Modal.Header closeButton>
                 <Modal.Title>
-                    {todoToEdit ? "Add Todo" : "Edit Todo"}
+                    {todoToEdit ? "Edit Todo" : "Add todo"}
                 </Modal.Title>
             </Modal.Header>
 
