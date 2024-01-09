@@ -113,7 +113,7 @@ export const createSection: RequestHandler<TodoInterfaces.CreateSectionParams, u
         const updatedTodo = await TodoModel.findByIdAndUpdate(
             todoId,
             { $push: { sections: { name: sectionName } } },
-            { new: true }
+            { new: true}
         );
 
         if (!updatedTodo) {
@@ -153,8 +153,9 @@ export const updateSection: RequestHandler<TodoInterfaces.UpdateSectionParams, u
             throw createHttpError(404, "Could not update section name: section not found");
         }
 
-        res.status(200).json(updatedTodo);
+        const updatedSection = updatedTodo.sections.find(section => section._id?.equals(sectionId));
 
+        res.status(200).json(updatedSection);
     } catch (error) {
         next(error);
     }
@@ -204,7 +205,11 @@ export const createTask: RequestHandler<TodoInterfaces.CreateTaskParams, unknown
             throw createHttpError(404, "Could not create task: section not found");
         }
 
-        res.status(201).json(updatedTodo);
+        const updatedSection = updatedTodo.sections.find(section => section._id?.equals(sectionId));
+        const newTaskId = updatedSection?.tasks[updatedSection.tasks.length - 1]._id;
+        const newTask = updatedSection?.tasks.find(task => task._id?.equals(newTaskId));
+
+        res.status(201).json(newTask);
     } catch (error) {
         next(error);
     }
@@ -233,7 +238,10 @@ export const updateTaskName: RequestHandler<TodoInterfaces.UpdateTaskNameParams,
             throw createHttpError(404, "Could not update task name: Task not found");
         }
 
-        res.status(200).json(updatedTodo);
+        const updatedSection = updatedTodo.sections.find(section => section._id?.equals(sectionId));
+        const updatedTask = updatedSection?.tasks.find(task => task._id?.equals(taskId));
+
+        res.status(200).json(updatedTask);
 
     } catch (error) {
         next(error);
@@ -259,7 +267,10 @@ export const updateTaskStatus: RequestHandler<TodoInterfaces.UpdateTaskStatusPar
             throw createHttpError(404, "Could not update task status: Task not found");
         }
 
-        res.status(200).json(updatedTodo);
+        const updatedSection = updatedTodo.sections.find(section => section._id?.equals(sectionId));
+        const updatedTask = updatedSection?.tasks.find(task => task._id?.equals(taskId));
+
+        res.status(200).json(updatedTask);
 
     } catch (error) {
         next(error);
