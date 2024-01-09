@@ -7,12 +7,13 @@ import styles from "../styles/section.module.css"
 
 interface SectionProps {
     onSectionToEdit: (section: SectionModel) => void,
+    onSectionToDelete: (section: SectionModel) => void,
     section: SectionModel,
     className?: string,
     children?: ReactNode;
 }
 
-const Section = ({ onSectionToEdit, section, className, children }: SectionProps) => {
+const Section = ({ onSectionToEdit, onSectionToDelete, section, className, children }: SectionProps) => {
     return (
         <Card className={`${styles.todoCard} ${className}`}>
             <Card.Body>
@@ -23,7 +24,7 @@ const Section = ({ onSectionToEdit, section, className, children }: SectionProps
                         </div>
                         <div className={styles.iconsContainer}>
                             <MdModeEditOutline className={styles.editIcon} onClick={() => onSectionToEdit(section)}/>
-                            <MdDelete className={styles.trashIcon}/>
+                            <MdDelete className={styles.trashIcon} onClick={() => onSectionToDelete(section)}/>
                         </div>
                     </div>
 

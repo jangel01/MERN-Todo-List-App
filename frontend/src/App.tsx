@@ -51,6 +51,30 @@ function App() {
     }
   }
 
+  async function deleteSection(section: SectionModel) {
+    try {
+      const todoId = selectedTodo?._id || ""
+      await TodosApi.deleteSection(todoId, section._id)
+
+      const updatedSections = selectedTodo?.sections.filter(existingSection => existingSection._id !== section._id);
+      
+      if (selectedTodo && updatedSections) {
+        setSelectedTodo({
+            ...selectedTodo,
+            sections: updatedSections
+        });
+
+        setTodos(todos.map(todo => 
+            todo._id === selectedTodo._id ? { ...todo, sections: updatedSections } : todo
+        ));
+    }
+
+    } catch (error) {
+      console.error(error);
+      alert(error);
+    }
+  }
+
   return (
     <div className="App">
       <TodoConfigure selectedTodo={selectedTodo} todos={todos} onSelect={(todo) => setSelectedTodo(todo)} onNewTodoClicked={() => setShowAddTodoDialog(true)} onEditTodoClicked={() => setShowEditTodoDialog(true)} />
@@ -109,7 +133,7 @@ function App() {
         <Row xs={1} md={2} xl={3} className={`g-4 ${styles.sectionGrid}`}>
           {selectedTodo && selectedTodo.sections.map(section => (
             <Col>
-              <Section onSectionToEdit={setSectionToEdit} section={section} className={styles.section}>
+              <Section onSectionToEdit={setSectionToEdit} onSectionToDelete={deleteSection} section={section} className={styles.section}>
                 {/* {section.tasks.map((task) => (
                   <p>{task.description}</p>
                 ))} */}

@@ -72,7 +72,7 @@ export async function updateSection(todoId: string, sectionId: string, section: 
     return response.json();
 }
 
-
-
-
+export async function deleteSection(todoId: string, sectionId: string) {
+    await fetchData("api/todos/" + todoId + "/sections/" + sectionId, {method: "DELETE"});
+}
 
