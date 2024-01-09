@@ -21,8 +21,8 @@ const Section = ({ section, className, children }: SectionProps) => {
                             {section.name}
                         </div>
                         <div className={styles.iconsContainer}>
-                            <MdModeEditOutline className={styles.icon}/>
-                            <MdDelete/>
+                            <MdModeEditOutline className={styles.editIcon}/>
+                            <MdDelete className={styles.trashIcon}/>
                         </div>
                     </div>
 

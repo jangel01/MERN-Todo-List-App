@@ -12,7 +12,17 @@
     display: flex;
 }
 
-.icon {
-    padding-right:3px;
+.editIcon, .trashIcon {
+    margin-right: 3px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.editIcon:hover {
+    color: rgb(51, 96, 219);
+}
+
+.trashIcon:hover {
+    color: rgb(206, 72, 72);
 }
 

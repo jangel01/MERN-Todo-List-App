@@ -9,6 +9,7 @@ import styles from "./styles/TodoPage.module.css";
 import styleUtils from "./styles/utils.module.css";
 import { FaPlus } from "react-icons/fa";
 import AddEditSectionDialog from './components/AddEditSectionDialog';
+import * as TodosApi from "./network/todos_api"
 
 function App() {
   const [todos, setTodos] = useState<TodoModel[]>([]);
@@ -37,6 +38,18 @@ function App() {
     loadTodos();
   }, []);
 
+  async function deleteTodo(todo: TodoModel) {
+    try {
+      await TodosApi.deleteTodo(todo._id);
+      setTodos(todos.filter(existingTodo => existingTodo._id !== todo._id))
+      setSelectedTodo(todos.length > 0 ? todos[0] : null);
+      setShowEditTodoDialog(false);
+    } catch (error) {
+      console.error(error);
+      alert(error);
+    }
+  }
+
   return (
     <div className="App">
       <TodoConfigure selectedTodo={selectedTodo} todos={todos} onSelect={(todo) => setSelectedTodo(todo)} onNewTodoClicked={() => setShowAddTodoDialog(true)} onEditTodoClicked={() => setShowEditTodoDialog(true)} />
@@ -52,6 +65,7 @@ function App() {
 
       {selectedTodo && showEditTodoDialog && <AddEditTodoDialog
         todoToEdit={selectedTodo}
+        onDeleteTodoClicked={() => deleteTodo(selectedTodo)}
         onDismiss={() => setShowEditTodoDialog(false)}
         onTodoSaved={(updatedTodo) => {
           setTodos(todos.map(existingTodo => existingTodo._id === updatedTodo._id ? updatedTodo : existingTodo));

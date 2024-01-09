@@ -8,11 +8,12 @@ import TextInputField from "./form/TextInputField";
 
 interface AddEditTodoDialogProps {
     todoToEdit?: TodoModel | null,
+    onDeleteTodoClicked?: () => void,
     onDismiss: () => void,
     onTodoSaved: (Todo: TodoModel) => void,
 }
 
-const AddEditTodoDialog = ({todoToEdit, onDismiss, onTodoSaved}: AddEditTodoDialogProps) => {
+const AddEditTodoDialog = ({todoToEdit, onDeleteTodoClicked, onDismiss, onTodoSaved}: AddEditTodoDialogProps) => {
     const {register, handleSubmit, formState: {errors, isSubmitting}} = useForm<TodoInput>({
         defaultValues: {
             name: todoToEdit?.name || ""
@@ -55,6 +56,8 @@ const AddEditTodoDialog = ({todoToEdit, onDismiss, onTodoSaved}: AddEditTodoDial
                     error={errors.name}
                     />
                 </Form>
+
+                {todoToEdit && <Button variant="danger" onClick={onDeleteTodoClicked}>Delete Todo</Button>}
             </Modal.Body>
 
             <Modal.Footer>

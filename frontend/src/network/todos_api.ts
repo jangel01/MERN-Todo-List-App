@@ -40,6 +40,10 @@ export async function updateTodo(todoId: string, todo: TodoInput): Promise<TodoM
     return response.json();
 }
 
+export async function deleteTodo(todoId: string) {
+    await fetchData("/api/todos/" + todoId, {method: "DELETE"});
+}
+
 export interface SectionInput {
     name?: string,
 }
@@ -55,6 +59,8 @@ export async function createSection(todoId: string, section: SectionInput) {
 
     return response.json();
 }
+
+
 
 
 
