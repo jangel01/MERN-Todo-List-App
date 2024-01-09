@@ -6,13 +6,13 @@ import TextInputField from "./form/TextInputField";
 import * as TodosApi from "../network/todos_api"
 
 interface AddEditSectionDialogProps {
-    sectionToEdit? : SectionModel | null,
     todoId: string,
+    sectionToEdit? : SectionModel | null,
     onDismiss: () => void,
     onSectionSaved: (Section: SectionModel) => void,
 }
 
-const AddEditSectionDialog = ({sectionToEdit, todoId, onDismiss, onSectionSaved}: AddEditSectionDialogProps) => {
+const AddEditSectionDialog = ({todoId, sectionToEdit, onDismiss, onSectionSaved}: AddEditSectionDialogProps) => {
     const {register, handleSubmit, formState: {errors, isSubmitting}} = useForm<SectionInput>({
         defaultValues: {
             name: sectionToEdit?.name || ""
@@ -23,13 +23,11 @@ const AddEditSectionDialog = ({sectionToEdit, todoId, onDismiss, onSectionSaved}
         try {
             let sectionResponse: SectionModel;
 
-            sectionResponse = await TodosApi.createSection(todoId, input);
-
-            // if (todoToEdit) {
-            //     todoResponse = await TodosApi.updateTodo(todoToEdit._id, input);
-            // } else {
-            //     todoResponse = await TodosApi.createTodo(input);
-            // }
+            if (sectionToEdit) {
+                sectionResponse = await TodosApi.updateSection(todoId, sectionToEdit._id, input);
+            } else {
+                sectionResponse = await TodosApi.createSection(todoId, input);
+            }
 
             onSectionSaved(sectionResponse);
         } catch (error) {

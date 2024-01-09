@@ -6,12 +6,13 @@ import { MdModeEditOutline } from "react-icons/md";
 import styles from "../styles/section.module.css"
 
 interface SectionProps {
+    onSectionToEdit: (section: SectionModel) => void,
     section: SectionModel,
     className?: string,
     children?: ReactNode;
 }
 
-const Section = ({ section, className, children }: SectionProps) => {
+const Section = ({ onSectionToEdit, section, className, children }: SectionProps) => {
     return (
         <Card className={`${styles.todoCard} ${className}`}>
             <Card.Body>
@@ -21,7 +22,7 @@ const Section = ({ section, className, children }: SectionProps) => {
                             {section.name}
                         </div>
                         <div className={styles.iconsContainer}>
-                            <MdModeEditOutline className={styles.editIcon}/>
+                            <MdModeEditOutline className={styles.editIcon} onClick={() => onSectionToEdit(section)}/>
                             <MdDelete className={styles.trashIcon}/>
                         </div>
                     </div>

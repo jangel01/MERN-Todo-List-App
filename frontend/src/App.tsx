@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import { Todo as TodoModel } from './models/todo';
+import { Section as SectionModel, Todo as TodoModel } from './models/todo';
 import TodoConfigure from './components/todoConfigure';
 import AddEditTodoDialog from './components/AddEditTodoDialog';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import Section from './components/section';
 import styles from "./styles/TodoPage.module.css";
 import styleUtils from "./styles/utils.module.css";
 import { FaPlus } from "react-icons/fa";
 import AddEditSectionDialog from './components/AddEditSectionDialog';
 import * as TodosApi from "./network/todos_api"
+import Section from './components/section';
 
 function App() {
   const [todos, setTodos] = useState<TodoModel[]>([]);
   const [selectedTodo, setSelectedTodo] = useState<TodoModel | null>(null);
+  const [sectionToEdit, setSectionToEdit] = useState<SectionModel | null>(null);
 
   const [showAddTodoDialog, setShowAddTodoDialog] = useState(false);
   const [showEditTodoDialog, setShowEditTodoDialog] = useState(false);
@@ -85,6 +86,21 @@ function App() {
         }}
       />}
 
+      {selectedTodo && sectionToEdit && <AddEditSectionDialog
+        todoId={selectedTodo._id}
+        sectionToEdit={sectionToEdit}
+        onDismiss={() => setSectionToEdit(null)}
+        onSectionSaved={(updatedSection) => {
+          const updatedSections = selectedTodo.sections.map(section => (
+            section._id === updatedSection._id ? updatedSection : section
+          ))
+
+          setSelectedTodo({ ...selectedTodo, sections: updatedSections })
+          setTodos(todos.map(todo => todo._id === selectedTodo._id ? { ...todo, sections: updatedSections } : todo));
+          setSectionToEdit(null);
+        }}
+      />}
+
       {selectedTodo && <Button className={`${styleUtils.blockCenter} ${styleUtils.flexCenter}`} onClick={() => setShowAddSectionDialog(true)}>
         <FaPlus />
         New Section</Button>}
@@ -93,7 +109,7 @@ function App() {
         <Row xs={1} md={2} xl={3} className={`g-4 ${styles.sectionGrid}`}>
           {selectedTodo && selectedTodo.sections.map(section => (
             <Col>
-              <Section section={section} className={styles.section}>
+              <Section onSectionToEdit={setSectionToEdit} section={section} className={styles.section}>
                 {/* {section.tasks.map((task) => (
                   <p>{task.description}</p>
                 ))} */}

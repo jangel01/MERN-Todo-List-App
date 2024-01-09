@@ -60,6 +60,18 @@ export async function createSection(todoId: string, section: SectionInput) {
     return response.json();
 }
 
+export async function updateSection(todoId: string, sectionId: string, section: SectionInput) {
+    const response = await fetchData("api/todos/" + todoId + "/sections/" + sectionId, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(section),
+    });
+
+    return response.json();
+}
+
 
 
 
