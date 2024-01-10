@@ -76,3 +76,27 @@ export async function deleteSection(todoId: string, sectionId: string) {
     await fetchData("api/todos/" + todoId + "/sections/" + sectionId, {method: "DELETE"});
 }
 
+export async function createTask(todoId: string, sectionId: string, section: SectionInput) {
+    const response = await fetchData("/api/todos/" + todoId + "/sections/" + sectionId + "/tasks/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(section),
+    });
+
+    return response.json();
+}
+
+export async function updateTaskStatus(todoId: string, sectionId: string, taskId: string, section: SectionInput) {
+    const response = await fetchData("/api/todos/" + todoId + "/sections/" + sectionId + "/tasks/" + taskId + "/completed/", {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(section),
+    });
+
+    return response.json();
+}
+

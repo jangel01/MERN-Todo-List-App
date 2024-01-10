@@ -10,6 +10,7 @@ import { FaPlus } from "react-icons/fa";
 import AddEditSectionDialog from './components/AddEditSectionDialog';
 import * as TodosApi from "./network/todos_api"
 import Section from './components/section';
+import Task from './components/task';
 
 function App() {
   const [todos, setTodos] = useState<TodoModel[]>([]);
@@ -57,17 +58,17 @@ function App() {
       await TodosApi.deleteSection(todoId, section._id)
 
       const updatedSections = selectedTodo?.sections.filter(existingSection => existingSection._id !== section._id);
-      
+
       if (selectedTodo && updatedSections) {
         setSelectedTodo({
-            ...selectedTodo,
-            sections: updatedSections
+          ...selectedTodo,
+          sections: updatedSections
         });
 
-        setTodos(todos.map(todo => 
-            todo._id === selectedTodo._id ? { ...todo, sections: updatedSections } : todo
+        setTodos(todos.map(todo =>
+          todo._id === selectedTodo._id ? { ...todo, sections: updatedSections } : todo
         ));
-    }
+      }
 
     } catch (error) {
       console.error(error);
@@ -77,8 +78,6 @@ function App() {
 
   return (
     <div className="App">
-      <TodoConfigure selectedTodo={selectedTodo} todos={todos} onSelect={(todo) => setSelectedTodo(todo)} onNewTodoClicked={() => setShowAddTodoDialog(true)} onEditTodoClicked={() => setShowEditTodoDialog(true)} />
-
       {showAddTodoDialog && <AddEditTodoDialog
         onDismiss={() => setShowAddTodoDialog(false)}
         onTodoSaved={(newTodo) => {
@@ -125,18 +124,22 @@ function App() {
         }}
       />}
 
-      {selectedTodo && <Button className={`${styleUtils.blockCenter} ${styleUtils.flexCenter}`} onClick={() => setShowAddSectionDialog(true)}>
-        <FaPlus />
-        New Section</Button>}
-
       <Container>
+        <TodoConfigure selectedTodo={selectedTodo} todos={todos} onSelect={(todo) => setSelectedTodo(todo)} onNewTodoClicked={() => setShowAddTodoDialog(true)} onEditTodoClicked={() => setShowEditTodoDialog(true)} />
+
+        {selectedTodo && <Button className={`${styleUtils.blockCenter} ${styleUtils.flexCenter}`} onClick={() => setShowAddSectionDialog(true)}>
+          <FaPlus />
+          New Section</Button>}
+
         <Row xs={1} md={2} xl={3} className={`g-4 ${styles.sectionGrid}`}>
           {selectedTodo && selectedTodo.sections.map(section => (
             <Col>
               <Section onSectionToEdit={setSectionToEdit} onSectionToDelete={deleteSection} section={section} className={styles.section}>
-                {/* {section.tasks.map((task) => (
-                  <p>{task.description}</p>
-                ))} */}
+                <FaPlus />
+
+                {section.tasks.map((task) => (
+                  <Task task={task} />
+                ))}
               </Section>
             </Col>
           ))}

@@ -1,6 +1,8 @@
 import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import todosRoutes from "./routes/todos";
+import sectionsRoutes from "./routes/sections"
+import tasksRoutes from "./routes/tasks"
 import morgan from "morgan";
 import createHttpError, {isHttpError} from "http-errors";
 
@@ -11,6 +13,8 @@ app.use(morgan("dev"));
 app.use(express.json());
 
 app.use("/api/todos", todosRoutes);
+app.use("/api/sections", sectionsRoutes);
+app.use("/api/tasks", tasksRoutes)
 
 app.use((req, res, next) => {
     next(createHttpError(404, "Endpoint not found"));
