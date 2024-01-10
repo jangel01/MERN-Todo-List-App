@@ -6,8 +6,8 @@ import * as SectionInterfaces from "../interfaces/section";
 
 export const getSections: RequestHandler = async (req, res, next) => {
     try {
-        const todos = await SectionModel.find().exec();
-        res.status(200).json(todos);
+        const sections = await SectionModel.find().exec();
+        res.status(200).json(sections);
     } catch (error) {
         next(error);
     }
@@ -18,8 +18,8 @@ export const getSection: RequestHandler = async (req, res, next) => {
     const todoId = req.body.todoId;
 
     try {
-        if (!mongoose.isValidObjectId(sectionId)) {
-            throw createHttpError(400, "Invalid section id specified");
+        if (!mongoose.isValidObjectId(todoId) || !mongoose.isValidObjectId(sectionId)) {
+            throw createHttpError(400, "Invalid todo or section id specified");
         }
 
         const section = await SectionModel.findOne({ _id: sectionId, todoId: todoId }).exec();

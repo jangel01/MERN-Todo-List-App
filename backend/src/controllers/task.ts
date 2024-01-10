@@ -4,6 +4,36 @@ import mongoose from "mongoose";
 import {SectionModel, TaskModel} from "../models/models";
 import { RequestHandler } from "express";
 
+export const getTasks: RequestHandler = async (req, res, next) => {
+    try {
+        const tasks = await TaskModel.find().exec();
+        res.status(200).json(tasks);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getTask: RequestHandler = async (req, res, next) => {
+    const taskId = req.params.todoId;
+    const sectionId = req.body.sectionId;
+
+    try {
+        if (!mongoose.isValidObjectId(sectionId) || !mongoose.isValidObjectId(taskId)) {
+            throw createHttpError(400, "Invalid section or task id specified");
+        }
+
+        const task = await TaskModel.findOne({ _id: taskId, sectionId: sectionId}).exec();
+
+        if (!task) {
+            throw createHttpError(404, "Error: Task not found");
+        }
+
+        res.status(200).json(task);
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const createTask: RequestHandler<unknown, unknown, TaskInterfaces.CreateTaskBody, unknown> = async (req, res, next) => {
     const taskDescription = req.body.taskDescription;
     const sectionId = req.body.sectionId;
