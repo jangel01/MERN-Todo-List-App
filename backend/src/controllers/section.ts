@@ -106,7 +106,7 @@ export const updateSection: RequestHandler<SectionInterfaces.UpdateSectionParams
 };
 
 export const deleteSection: RequestHandler = async (req, res, next) => {
-    const sectionId = req.params.id;
+    const sectionId = req.params.sectionId;
 
     const todoId = req.body.todoId;
 

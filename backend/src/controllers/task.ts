@@ -14,12 +14,12 @@ export const getTasks: RequestHandler = async (req, res, next) => {
 };
 
 export const getTask: RequestHandler = async (req, res, next) => {
-    const taskId = req.params.todoId;
+    const taskId = req.params.taskId;
     const sectionId = req.body.sectionId;
 
     try {
         if (!mongoose.isValidObjectId(sectionId) || !mongoose.isValidObjectId(taskId)) {
-            throw createHttpError(400, "Invalid section or task id specified");
+            throw createHttpError(400, "Error: Invalid section or task id specified");
         }
 
         const task = await TaskModel.findOne({ _id: taskId, sectionId: sectionId}).exec();
