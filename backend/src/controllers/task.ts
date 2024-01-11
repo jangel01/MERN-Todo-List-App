@@ -5,8 +5,21 @@ import {SectionModel, TaskModel} from "../models/models";
 import { RequestHandler } from "express";
 
 export const getTasks: RequestHandler = async (req, res, next) => {
+    const sectionId = req.params.sectionId;
+
     try {
-        const tasks = await TaskModel.find().exec();
+        if (!mongoose.isValidObjectId(sectionId)) {
+            throw createHttpError(400, "Error: Invalid section id specified");
+        }
+
+        const section = await SectionModel.findById(sectionId).exec();
+
+        if (!section) {
+            throw createHttpError(404, "Error: Can not fetch tasks -- section does not exist");
+        }
+
+        const tasks = await TaskModel.find({sectionId: sectionId}).exec();
+        
         res.status(200).json(tasks);
     } catch (error) {
         next(error);

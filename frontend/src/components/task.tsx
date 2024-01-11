@@ -1,5 +1,5 @@
 import { Form, ListGroup } from "react-bootstrap";
-import { Task as TaskModel} from "../models/todo";
+import { Task as TaskModel} from "../models/task";
 import { useState } from "react";
 
 interface TaskProps {
@@ -7,7 +7,7 @@ interface TaskProps {
 }
 
 const Task = ({task} : TaskProps) => {
-    const [isCompleted, setCompleted] = useState(task.completed);
+    const [isCompleted, setCompleted] = useState(task.taskCompleted);
 
     // const handleCheckboxChange = async () => {
     //     try {
@@ -23,7 +23,7 @@ const Task = ({task} : TaskProps) => {
             <Form.Check
             type="checkbox"
             id={task._id}
-            label={task.description}
+            label={task.taskDescription}
             checked={isCompleted}
             />
         </ListGroup>

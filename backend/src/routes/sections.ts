@@ -3,11 +3,11 @@ import * as SectionsController from "../controllers/section";
 
 const router = express.Router();
 
-router.get("/", SectionsController.getSections);
-
 router.post("/", SectionsController.createSection);
 
-router.get("/:sectionId", SectionsController.getSection);
+router.get("/:todoId/getSections", SectionsController.getSections);
+
+router.get("/:sectionId/getSection", SectionsController.getSection);
 
 router.patch("/:sectionId", SectionsController.updateSection);
 

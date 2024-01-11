@@ -19,7 +19,7 @@ const SelectTodo = ({ selectedTodo, todos, onSelect }: SelectedTodoProps) => {
   return (
     <Form.Select aria-label="Select todo" onChange={handleSelectChange} value={selectedTodo ? selectedTodo._id : ''}>
       {todos.map((todo) => (
-        <option key={todo._id} value={todo._id}>{todo.name}</option>
+        <option key={todo._id} value={todo._id}>{todo.todoName}</option>
       ))}
     </Form.Select>
   );

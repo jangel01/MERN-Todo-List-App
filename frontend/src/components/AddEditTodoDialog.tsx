@@ -1,7 +1,7 @@
 import { Button, Form, Modal } from "react-bootstrap";
 import { Todo as TodoModel} from "../models/todo";
 import { useForm } from "react-hook-form";
-import { TodoInput } from "../network/todos_api";
+import { TodoInput } from "../network/interfaces/todo";
 import * as TodosApi from "../network/todos_api"
 import TextInputField from "./form/TextInputField";
 
@@ -16,7 +16,7 @@ interface AddEditTodoDialogProps {
 const AddEditTodoDialog = ({todoToEdit, onDeleteTodoClicked, onDismiss, onTodoSaved}: AddEditTodoDialogProps) => {
     const {register, handleSubmit, formState: {errors, isSubmitting}} = useForm<TodoInput>({
         defaultValues: {
-            name: todoToEdit?.name || ""
+            todoName: todoToEdit?.todoName || ""
         }
     });
 
@@ -47,13 +47,13 @@ const AddEditTodoDialog = ({todoToEdit, onDeleteTodoClicked, onDismiss, onTodoSa
             <Modal.Body>
                 <Form id ="addEditTodoForm" onSubmit={handleSubmit(onSubmit)}>
                     <TextInputField
-                    name = "name"
+                    name = "todoName"
                     label = "Todo Name"
                     type = "text"
                     placeholder = "Todo Name"
                     register = {register}
                     registerOptions ={{required: "Required"}}
-                    error={errors.name}
+                    error={errors.todoName}
                     />
                 </Form>
 

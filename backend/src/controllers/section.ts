@@ -5,8 +5,21 @@ import {SectionModel, TodoModel, TaskModel} from "../models/models";
 import * as SectionInterfaces from "../interfaces/section";
 
 export const getSections: RequestHandler = async (req, res, next) => {
+    const todoId = req.params.todoId;
+
     try {
-        const sections = await SectionModel.find().exec();
+        if (!mongoose.isValidObjectId(todoId)) {
+            throw createHttpError(400, "Error: Invalid todo id specified");
+        }
+
+        const todo = await TodoModel.findById(todoId).exec();
+
+        if (!todo) {
+            throw createHttpError(404, "Error: Can not fetch sections -- todo does not exist");
+        }
+
+        const sections = await SectionModel.find({todoId : todoId}).exec();
+
         res.status(200).json(sections);
     } catch (error) {
         next(error);
@@ -19,7 +32,7 @@ export const getSection: RequestHandler = async (req, res, next) => {
 
     try {
         if (!mongoose.isValidObjectId(todoId) || !mongoose.isValidObjectId(sectionId)) {
-            throw createHttpError(400, "Invalid todo or section id specified");
+            throw createHttpError(400, "Error: Invalid todo or section id specified");
         }
 
         const section = await SectionModel.findOne({ _id: sectionId, todoId: todoId }).exec();

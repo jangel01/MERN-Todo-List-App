@@ -1,40 +1,36 @@
 import { Card } from "react-bootstrap";
-import { Section as SectionModel } from "../models/todo";
-import { ReactNode } from "react";
+import { Section as SectionModel } from "../models/section";
+import sectionLayoutStyles from "../styles/sectionLayout.module.css";
+import sectionStyles from "../styles/section.module.css";
 import { MdDelete } from "react-icons/md";
 import { MdModeEditOutline } from "react-icons/md";
-import styles from "../styles/section.module.css"
 
 interface SectionProps {
-    onSectionToEdit: (section: SectionModel) => void,
-    onSectionToDelete: (section: SectionModel) => void,
     section: SectionModel,
-    className?: string,
-    children?: ReactNode;
+    onEditSectionIconClicked: (section : SectionModel) => void,
+    onDeleteSectionIconClicked: (section : SectionModel) => void,
 }
 
-const Section = ({ onSectionToEdit, onSectionToDelete, section, className, children }: SectionProps) => {
+const Section = ({ section, onEditSectionIconClicked, onDeleteSectionIconClicked }: SectionProps) => {
     return (
-        <Card className={`${styles.todoCard} ${className}`}>
+        <Card className={`${sectionStyles.sectionCard} ${sectionLayoutStyles.section}`}>
             <Card.Body>
                 <Card.Title>
-                    <div className={styles.headerContainer}>
+                    <div className={sectionStyles.headerContainer}>
                         <div>
-                            {section.name}
+                            {section.sectionName}
                         </div>
-                        <div className={styles.iconsContainer}>
-                            <MdModeEditOutline className={styles.editIcon} onClick={() => onSectionToEdit(section)}/>
-                            <MdDelete className={styles.trashIcon} onClick={() => onSectionToDelete(section)}/>
+                        <div className={sectionStyles.iconsContainer}>
+                            <MdModeEditOutline className={sectionStyles.editIcon} onClick={() => onEditSectionIconClicked(section)}/>
+                            <MdDelete className={sectionStyles.trashIcon} onClick={() => onDeleteSectionIconClicked(section)}/>
                         </div>
                     </div>
 
                 </Card.Title>
                 <Card.Text>
-
-                    {children}
                 </Card.Text>
             </Card.Body>
-        </Card>
+        </Card >
     );
 }
 

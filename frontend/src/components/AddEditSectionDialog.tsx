@@ -1,9 +1,9 @@
 import { Button, Form, Modal } from "react-bootstrap";
-import { Section as SectionModel} from "../models/todo";
+import { Section as SectionModel} from "../models/section";
 import { useForm } from "react-hook-form";
-import { SectionInput } from "../network/todos_api";
+import { SectionInput } from "../network/interfaces/section";
 import TextInputField from "./form/TextInputField";
-import * as TodosApi from "../network/todos_api"
+import * as SectionsApi from "../network/sections_api"
 
 interface AddEditSectionDialogProps {
     todoId: string,
@@ -15,7 +15,7 @@ interface AddEditSectionDialogProps {
 const AddEditSectionDialog = ({todoId, sectionToEdit, onDismiss, onSectionSaved}: AddEditSectionDialogProps) => {
     const {register, handleSubmit, formState: {errors, isSubmitting}} = useForm<SectionInput>({
         defaultValues: {
-            name: sectionToEdit?.name || ""
+            sectionName: sectionToEdit?.sectionName || ""
         }
     });
 
@@ -24,9 +24,9 @@ const AddEditSectionDialog = ({todoId, sectionToEdit, onDismiss, onSectionSaved}
             let sectionResponse: SectionModel;
 
             if (sectionToEdit) {
-                sectionResponse = await TodosApi.updateSection(todoId, sectionToEdit._id, input);
+                sectionResponse = await SectionsApi.updateSection(todoId, sectionToEdit._id, input);
             } else {
-                sectionResponse = await TodosApi.createSection(todoId, input);
+                sectionResponse = await SectionsApi.createSection(todoId, input);
             }
 
             onSectionSaved(sectionResponse);
@@ -46,12 +46,12 @@ const AddEditSectionDialog = ({todoId, sectionToEdit, onDismiss, onSectionSaved}
             <Modal.Body>
                 <Form id ="addEditSectionForm" onSubmit={handleSubmit(onSubmit)}>
                     <TextInputField
-                    name = "name"
+                    name = "sectionName"
                     label = "Section Name"
                     type = "text"
                     placeholder = "Section Name"
                     register = {register}
-                    error={errors.name}
+                    error={errors.sectionName}
                     />
                 </Form>
             </Modal.Body>

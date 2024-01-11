@@ -19,7 +19,9 @@ const TodoConfigure = ({ selectedTodo, todos, onSelect, onNewTodoClicked, onEdit
       {todos.length > 0 ? (
         <>
           <SelectTodo selectedTodo={selectedTodo} todos={todos} onSelect={onSelect} />
-          <Button variant="secondary" className={`${styleUtils.blockCenter} ${styleUtils.flexCenter}`} onClick={onNewTodoClicked}>
+          <Button variant="secondary" className={`${styleUtils.blockCenter} ${styleUtils.flexCenter}`} 
+          onClick={onNewTodoClicked}>
+
             <FaPlus />
             New
           </Button>

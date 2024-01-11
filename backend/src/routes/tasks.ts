@@ -3,11 +3,11 @@ import * as TasksController from "../controllers/task";
 
 const router = express.Router();
 
-router.get("/", TasksController.getTasks);
-
 router.post("/", TasksController.createTask);
 
-router.get("/:taskId", TasksController.getTask);
+router.get("/:sectionId/getTasks", TasksController.getTasks);
+
+router.get("/:taskId/getTask", TasksController.getTask);
 
 router.delete("/:taskId", TasksController.deleteTask);
 
