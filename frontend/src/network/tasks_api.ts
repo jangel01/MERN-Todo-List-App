@@ -1,5 +1,5 @@
 import fetchData from "./utils/fetchData";
-import { TaskInput, TaskDescriptionInput, TaskStatusInput } from "./interfaces/task";
+import { TaskDescriptionInput, TaskStatusInput } from "./interfaces/task";
 import { Task as TaskModel } from '../models/task';
 
 export async function fetchTasks(sectionId: string): Promise<TaskModel[]> {
@@ -20,7 +20,7 @@ export async function fetchTask(sectionId: string, taskId: string): Promise<Task
     return response.json();
 }
 
-export async function createTask(sectionId: string, task: TaskInput) {
+export async function createTask(sectionId: string, task: TaskDescriptionInput) {
     const body = {...task, sectionId}
 
     const response = await fetchData("/api/tasks/", {

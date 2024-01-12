@@ -73,8 +73,8 @@ const SectionLayout = ({ todo }: SectionLayoutProps) => {
             />}
 
             {todo && <Button
-                className={`${styleUtils.blockCenter} 
-                ${styleUtils.flexCenter}`}
+                variant="success"
+                className={`${styleUtils.blockCenter} ${styleUtils.flexCenter} my-3`}
                 onClick={() => setShowAddSectionDialog(true)}>
                 <FaPlus />
                 New Section</Button>}
