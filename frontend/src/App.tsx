@@ -23,6 +23,7 @@ function App() {
         if (todos.length > 0) {
           setSelectedTodo(todos[0]);
         }
+
       } catch (error) {
         console.error(error);
         alert(error);

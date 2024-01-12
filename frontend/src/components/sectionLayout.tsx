@@ -26,6 +26,7 @@ const SectionLayout = ({ todo }: SectionLayoutProps) => {
                     const sections = await SectionsApi.fetchSections(todo._id);
                     setSections(sections);
                 }
+
             } catch (error) {
                 console.error(error);
                 alert(error);
@@ -81,9 +82,8 @@ const SectionLayout = ({ todo }: SectionLayoutProps) => {
             {todo ? (
                 <Row xs={1} md={2} xl={3} className={`g-4 ${sectionLayoutStyles.sectionGrid}`}>
                     {sections.map((section) => (
-                        <Col>
+                        <Col key={section._id}>
                             <Section
-                                key={section._id}
                                 section={section}
                                 onEditSectionIconClicked={setSelectedSection}
                                 onDeleteSectionIconClicked={deleteSection} />

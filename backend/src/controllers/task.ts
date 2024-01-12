@@ -19,7 +19,7 @@ export const getTasks: RequestHandler = async (req, res, next) => {
         }
 
         const tasks = await TaskModel.find({sectionId: sectionId}).exec();
-        
+
         res.status(200).json(tasks);
     } catch (error) {
         next(error);
@@ -129,7 +129,7 @@ export const updateTaskStatus: RequestHandler<TaskInterfaces.UpdateTaskStatusPar
             throw createHttpError(400, "Error: Invalid section or task id specified");
         }
 
-        if (!taskCompleted) {
+        if (taskCompleted === undefined) {
             throw createHttpError(404, "Error: Can not update task status -- boolean is undefined");
         }
 
