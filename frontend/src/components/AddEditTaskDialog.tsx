@@ -48,9 +48,9 @@ const AddEditTaskDialog = ({ sectionId, taskToEdit, onDismiss, onTaskSaved, onDe
                 <Form id="addEditTaskForm" onSubmit={handleSubmit(onSubmit)}>
                     <TextInputField
                         name="taskDescription"
-                        label="Task Description"
+                        label="Task"
                         type="text"
-                        placeholder="Task Description"
+                        placeholder="Task"
                         register={register}
                         error={errors.taskDescription}
                     />

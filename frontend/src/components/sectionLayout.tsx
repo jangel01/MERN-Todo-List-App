@@ -25,8 +25,7 @@ const SectionLayout = ({ todo }: SectionLayoutProps) => {
                 if (todo) {
                     const sections = await SectionsApi.fetchSections(todo._id);
                     setSections(sections);
-                }
-
+                } 
             } catch (error) {
                 console.error(error);
                 alert(error);
@@ -77,10 +76,10 @@ const SectionLayout = ({ todo }: SectionLayoutProps) => {
                 className={`${styleUtils.blockCenter} ${styleUtils.flexCenter} my-3`}
                 onClick={() => setShowAddSectionDialog(true)}>
                 <FaPlus />
-                New Section</Button>}
+                Section</Button>}
 
-            {todo ? (
-                <Row xs={1} md={2} xl={3} className={`g-4 ${sectionLayoutStyles.sectionGrid}`}>
+            {sections.length > 0 ? (
+                <Row xs={1} md={2} xl={3} className={`g-4 mx-0 ${sectionLayoutStyles.sectionGrid}`}>
                     {sections.map((section) => (
                         <Col key={section._id}>
                             <Section
@@ -91,7 +90,7 @@ const SectionLayout = ({ todo }: SectionLayoutProps) => {
                     ))}
                 </Row>
             ) : (
-                <div>No todo item selected.</div>
+                <p>Ready to get organized? Create a section for your todo!</p>
             )}
         </div>
     );

@@ -6,14 +6,22 @@
     display:flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap:wrap;
+}
+
+.nameContainer {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .iconsContainer {
     display: flex;
+    margin-left: auto;
 }
 
 .editIcon, .trashIcon {
-    margin-right: 3px;
+    margin-right: calc(3rem / 16);
     cursor: pointer;
     transition: color 0.3s ease;
 }

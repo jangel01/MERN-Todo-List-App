@@ -39,7 +39,7 @@ const AddEditSectionDialog = ({todoId, sectionToEdit, onDismiss, onSectionSaved}
         <Modal show onHide={onDismiss}>
             <Modal.Header closeButton>
                 <Modal.Title>
-                    {sectionToEdit ? "Edit Section" : "Add section"}
+                    {sectionToEdit ? "Edit Section" : "Add Section"}
                 </Modal.Title>
             </Modal.Header>
 

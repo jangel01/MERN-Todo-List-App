@@ -91,7 +91,7 @@ const Section = ({ section, onEditSectionIconClicked, onDeleteSectionIconClicked
                 <Card.Body>
                     <Card.Title>
                         <div className={sectionStyles.headerContainer}>
-                            <div className="font-weight-bold">
+                            <div className={`font-weight-bold ${sectionStyles.nameContainer}`}>
                                 {section.sectionName}
                             </div>
                             <div className={sectionStyles.iconsContainer}>
@@ -108,7 +108,7 @@ const Section = ({ section, onEditSectionIconClicked, onDeleteSectionIconClicked
                         </div>
 
                         {tasks.length > 0 ? (
-                            <div className="overflow-auto" style={{ maxHeight: "100px" }}>
+                            <div className="overflow-auto py-2" style={{ maxHeight: "6.25rem" }}>
                                 {tasks.map((task) => (
                                     <Task
                                         task={task}
@@ -118,7 +118,7 @@ const Section = ({ section, onEditSectionIconClicked, onDeleteSectionIconClicked
                                 ))}
                             </div>
                         ) : (
-                            <p>You have no tasks</p>
+                            <p>This section looks a bit lonely. How about adding a task?</p>
                         )}
                     </Card.Text>
                 </Card.Body>

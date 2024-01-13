@@ -40,7 +40,7 @@ const AddEditTodoDialog = ({todoToEdit, onDeleteTodoClicked, onDismiss, onTodoSa
         <Modal show onHide={onDismiss}>
             <Modal.Header closeButton>
                 <Modal.Title>
-                    {todoToEdit ? "Edit Todo" : "Add todo"}
+                    {todoToEdit ? "Edit Todo" : "Add Todo"}
                 </Modal.Title>
             </Modal.Header>
 
