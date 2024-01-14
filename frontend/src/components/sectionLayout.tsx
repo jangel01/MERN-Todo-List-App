@@ -33,7 +33,8 @@ const SectionLayout = ({ todo }: SectionLayoutProps) => {
         }
 
         loadSections();
-    }, [todo])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     async function deleteSection(section: SectionModel) {
         try {

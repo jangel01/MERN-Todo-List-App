@@ -40,7 +40,8 @@ const Section = ({ section, onEditSectionIconClicked, onDeleteSectionIconClicked
         }
 
         loadTasks();
-    }, [section]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const onUpdateTaskStatus = async (task: TaskModel, taskCompleted: TaskStatusInput) => {
         try {
@@ -102,25 +103,25 @@ const Section = ({ section, onEditSectionIconClicked, onDeleteSectionIconClicked
                             </div>
                         </div>
                     </Card.Title>
-                    <Card.Text>
-                        <div className="d-flex my-2">
-                            <FaPlus className={`${styleUtils.cursorPointer} ml-auto`} onClick={() => setShowAddEditTaskDialog(true)} />
-                        </div>
 
-                        {tasks.length > 0 ? (
-                            <div className="overflow-auto py-2" style={{ maxHeight: "6.25rem" }}>
-                                {tasks.map((task) => (
-                                    <Task
-                                        task={task}
-                                        key={task._id}
-                                        onUpdateTaskDescription={setSelectedTask}
-                                        onUpdateTaskStatus={onUpdateTaskStatus} />
-                                ))}
-                            </div>
-                        ) : (
-                            <p>This section looks a bit lonely. How about adding a task?</p>
-                        )}
-                    </Card.Text>
+                    <div className="d-flex my-2">
+                        <FaPlus className={`${styleUtils.cursorPointer} ml-auto`} onClick={() => setShowAddEditTaskDialog(true)} />
+                    </div>
+
+                    {tasks.length > 0 ? (
+                        <div className="overflow-auto py-2" style={{ maxHeight: "6.25rem" }}>
+                            {tasks.map((task) => (
+                                <Task
+                                    task={task}
+                                    key={task._id}
+                                    onUpdateTaskDescription={setSelectedTask}
+                                    onUpdateTaskStatus={onUpdateTaskStatus} />
+                            ))}
+                        </div>
+                    ) : (
+                        <p>This section looks a bit lonely. How about adding a task?</p>
+                    )}
+                    
                 </Card.Body>
             </Card >
         </div>

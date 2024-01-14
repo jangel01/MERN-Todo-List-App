@@ -85,7 +85,7 @@ function App() {
               onNewTodoClicked={() => setShowAddTodoDialog(true)}
               onEditTodoClicked={() => setShowEditTodoDialog(true)} />
 
-            <SectionLayout todo={selectedTodo} />
+            <SectionLayout todo={selectedTodo} key={selectedTodo?._id}/>
           </>
         ) : (
           <>
