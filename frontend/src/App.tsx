@@ -83,11 +83,11 @@ function App() {
         onTodoSaved={(newTodo) => {
           setTodos((prevTodos) => {
             const updatedTodos = [...prevTodos, newTodo];
+            setCurrentTodoIndex(updatedTodos.length - 1);
             return updatedTodos;
           });
 
           setSelectedTodo(newTodo);
-          setCurrentTodoIndex(todos.length - 1);
           setShowAddTodoDialog(false);
         }}
       />}
