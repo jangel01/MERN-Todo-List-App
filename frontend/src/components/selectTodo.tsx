@@ -7,7 +7,7 @@ interface SelectedTodoProps {
   onSelect: (selectedTodo: TodoModel) => void;
 }
 
-const SelectTodo = ({ selectedTodo, todos, onSelect }: SelectedTodoProps) => {  
+const SelectTodo = ({ selectedTodo, todos, onSelect}: SelectedTodoProps) => {  
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTodo = todos.find((todo) => todo._id === e.target.value);
 

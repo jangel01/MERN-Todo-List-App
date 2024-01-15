@@ -1,20 +1,24 @@
 .blockCenter {
-    display:block;
-    margin-left:auto;
-    margin-right:auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .flexCenter {
     display: flex;
-    align-items:center;
+    align-items: center;
     justify-content: center;
     gap: (4rem / 16);
 }
 
 .cursorPointer {
-    cursor:pointer;
+    cursor: pointer;
 }
 
 .textHoverEffect:hover {
     background-color: rgb(245, 236, 202);
+}
+
+.lighterIcon {
+    opacity: 0.5;
 }

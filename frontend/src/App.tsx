@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import './App.css';
 import { Todo as TodoModel } from './models/todo';
 import * as TodosApi from "./network/todos_api"
 import { Button, Container } from 'react-bootstrap';
@@ -9,10 +8,13 @@ import SectionLayout from './components/sectionLayout';
 import appStyles from './styles/App.module.css';
 import styleUtils from "./styles/utils.module.css";
 import { FaPlus } from "react-icons/fa";
+import { IoIosArrowBack } from "react-icons/io";
+import { IoIosArrowForward } from "react-icons/io";
 
 function App() {
   const [todos, setTodos] = useState<TodoModel[]>([]);
   const [selectedTodo, setSelectedTodo] = useState<TodoModel | null>(null);
+  const [currentTodoIndex, setCurrentTodoIndex] = useState<number>(0);
 
   const [showAddTodoDialog, setShowAddTodoDialog] = useState(false);
   const [showEditTodoDialog, setShowEditTodoDialog] = useState(false);
@@ -39,10 +41,11 @@ function App() {
   async function deleteTodo(todo: TodoModel) {
     try {
       await TodosApi.deleteTodo(todo._id);
-  
+
       setTodos(prevTodos => {
         const updatedTodos = prevTodos.filter(existingTodo => existingTodo._id !== todo._id);
         setSelectedTodo(updatedTodos.length > 0 ? updatedTodos[0] : null);
+        setCurrentTodoIndex(0);
         return updatedTodos;
       });
 
@@ -53,13 +56,38 @@ function App() {
     }
   }
 
+  const handleBackClick = () => {
+    if (currentTodoIndex > 0) {
+      setCurrentTodoIndex(currentTodoIndex - 1);
+      setSelectedTodo(todos[currentTodoIndex - 1]);
+    }
+  }
+
+  const handleForwardClick = () => {
+    if (currentTodoIndex < todos.length - 1) {
+      setCurrentTodoIndex(currentTodoIndex + 1);
+      setSelectedTodo(todos[currentTodoIndex + 1]);
+    }
+  }
+
+  const updateCurrentTodoIndex = (selectedTodo: TodoModel) => {
+    const index = todos.findIndex((todo) => todo._id === selectedTodo._id);
+    setCurrentTodoIndex(index);
+    setSelectedTodo(todos[index]);
+  };
+
   return (
-    <div className="App">
+    <div>
       {showAddTodoDialog && <AddEditTodoDialog
         onDismiss={() => setShowAddTodoDialog(false)}
         onTodoSaved={(newTodo) => {
-          setTodos([...todos, newTodo]);
+          setTodos((prevTodos) => {
+            const updatedTodos = [...prevTodos, newTodo];
+            return updatedTodos;
+          });
+
           setSelectedTodo(newTodo);
+          setCurrentTodoIndex(todos.length - 1);
           setShowAddTodoDialog(false);
         }}
       />}
@@ -81,11 +109,24 @@ function App() {
             <TodoConfigure
               selectedTodo={selectedTodo}
               todos={todos}
-              onSelect={(todo) => setSelectedTodo(todo)}
+              onSelect={(todo) => updateCurrentTodoIndex(todo)}
               onNewTodoClicked={() => setShowAddTodoDialog(true)}
-              onEditTodoClicked={() => setShowEditTodoDialog(true)} />
+              onEditTodoClicked={() => setShowEditTodoDialog(true)}
+            />
 
-            <SectionLayout todo={selectedTodo} key={selectedTodo?._id}/>
+            <h1 className="py-2" style={{ wordWrap: 'break-word' }}>{selectedTodo?.todoName}</h1>
+
+            <IoIosArrowBack 
+            onClick={handleBackClick}
+            style={{fontSize: "1.5rem"}} 
+            className={currentTodoIndex === 0 ? `${styleUtils.lighterIcon}` : `${styleUtils.cursorPointer}`} />
+
+            <IoIosArrowForward 
+            onClick={handleForwardClick}
+            style={{fontSize: "1.5rem"}} 
+            className={currentTodoIndex === todos.length - 1 ? `${styleUtils.lighterIcon}` : `${styleUtils.cursorPointer}`} />
+
+            <SectionLayout todo={selectedTodo} key={selectedTodo?._id} />
           </>
         ) : (
           <>

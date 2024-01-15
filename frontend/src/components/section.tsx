@@ -119,7 +119,7 @@ const Section = ({ section, onEditSectionIconClicked, onDeleteSectionIconClicked
                             ))}
                         </div>
                     ) : (
-                        <p>This section looks a bit lonely. How about adding a task?</p>
+                        <p className="py-2">This section looks a bit lonely. How about adding a task?</p>
                     )}
                     
                 </Card.Body>

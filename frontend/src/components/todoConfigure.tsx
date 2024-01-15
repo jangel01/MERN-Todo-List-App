@@ -13,26 +13,26 @@ interface TodoConfigureProps {
   onEditTodoClicked: () => void,
 }
 
-const TodoConfigure = ({ selectedTodo, todos, onSelect, onNewTodoClicked, onEditTodoClicked }: TodoConfigureProps) => {
+const TodoConfigure = ({ selectedTodo, todos, onSelect, onNewTodoClicked, onEditTodoClicked}: TodoConfigureProps) => {
 
   return (
     <Row className="gy-3">
       <Col className="col-12 col-xl-10">
-        <SelectTodo selectedTodo={selectedTodo} todos={todos} onSelect={onSelect} />
+        <SelectTodo selectedTodo={selectedTodo} todos={todos} onSelect={onSelect}/>
       </Col>
 
       <Col className="col-12 col-xl-2">
         <ButtonGroup className="me-2">
-          <Button variant="secondary" className={`${styleUtils.flexCenter}`}
-            onClick={onNewTodoClicked}>
-            <FaPlus />
+          <Button variant="secondary" className={`${styleUtils.flexCenter}`} onClick={onEditTodoClicked}>
+            <MdModeEditOutline />
             Todo
           </Button>
         </ButtonGroup>
 
         <ButtonGroup>
-          <Button variant="secondary" className={`${styleUtils.flexCenter}`} onClick={onEditTodoClicked}>
-            <MdModeEditOutline />
+          <Button variant="secondary" className={`${styleUtils.flexCenter}`}
+            onClick={onNewTodoClicked}>
+            <FaPlus />
             Todo
           </Button>
         </ButtonGroup>
