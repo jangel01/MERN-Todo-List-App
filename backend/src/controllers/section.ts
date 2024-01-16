@@ -7,7 +7,7 @@ import * as SectionInterfaces from "../interfaces/section";
 export const getSections: RequestHandler = async (req, res, next) => {
     const todoId = req.params.todoId;
 
-    try {        
+    try {
         if (!mongoose.isValidObjectId(todoId)) {
             throw createHttpError(400, "Error: Invalid todo id specified");
         }

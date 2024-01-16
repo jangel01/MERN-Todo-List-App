@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Todo as TodoModel } from './models/todo';
 import * as TodosApi from "./network/todos_api"
 import { Button, Container, Spinner } from 'react-bootstrap';
@@ -22,28 +22,28 @@ function App() {
   const [showAddTodoDialog, setShowAddTodoDialog] = useState(false);
   const [showEditTodoDialog, setShowEditTodoDialog] = useState(false);
 
-  useEffect(() => {
-    async function loadTodos() {
-      try {
-        setShowTodosLoadingError(false);
-        setTodosLoading(true);
+  const loadTodos = useCallback(async () => {
+    try {
+      setShowTodosLoadingError(false);
+      setTodosLoading(true);
+      
+      const todos = await TodosApi.fetchTodos();
+      setTodos(todos);
 
-        const todos = await TodosApi.fetchTodos();
-        setTodos(todos);
-
-        if (todos.length > 0) {
-          setSelectedTodo(todos[0]);
-        }
-      } catch (error) {
-        console.error(error);
-        setShowTodosLoadingError(true);
-      } finally {
-        setTodosLoading(false);
+      if (todos.length > 0) {
+        setSelectedTodo(todos[0]);
       }
+    } catch (error) {
+      console.error(error);
+      setShowTodosLoadingError(true);
+    } finally {
+      setTodosLoading(false);
     }
-
-    loadTodos();
   }, []);
+
+  useEffect(() => {
+    loadTodos();
+  }, [loadTodos])
 
   async function deleteTodo(todo: TodoModel) {
     try {
@@ -112,7 +112,12 @@ function App() {
 
       <Container className={appStyles.pageContainer}>
         {todosLoading && <Spinner animation='border' variant='primary' />}
-        {showTodosLoadingError && <p className='my-2'>Something went wrong loading todos. Please refresh the page.</p>}
+        {showTodosLoadingError &&
+          <>
+            <p className='my-2'>Something went wrong loading todos. Please reload the page.</p>
+            <Button onClick={loadTodos}>Reload</Button>
+          </>
+        }
 
         {!todosLoading && !showTodosLoadingError &&
           <>

@@ -1,6 +1,6 @@
 import { Section as SectionModel } from "../models/section";
 import { Todo as TodoModel } from "../models/todo";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as SectionsApi from "../network/sections_api";
 import { Button, Col, Row, Spinner } from "react-bootstrap";
 import sectionLayoutStyles from "../styles/sectionLayout.module.css";
@@ -28,27 +28,27 @@ const SectionLayout = ({ todo }: SectionLayoutProps) => {
     const firstSectionIndex = lastSectionIndex - maxSectionsPerPage;
     const currentSections = sections.slice(firstSectionIndex, lastSectionIndex);
 
-    useEffect(() => {
-        async function loadSections() {
-            try {
-                if (todo) {
-                    setShowSectionsLoadingError(false);
-                    setSectionsLoading(true);
+    const loadSections = useCallback(async () => {
+        try {
+            if (todo) {
+                setShowSectionsLoadingError(false);
+                setSectionsLoading(true);
 
-                    const sections = await SectionsApi.fetchSections(todo._id);
-                    setSections(sections);
-                }
-            } catch (error) {
-                setShowSectionsLoadingError(true);
-                console.error(error);
-            } finally {
-                setSectionsLoading(false);
+                const sections = await SectionsApi.fetchSections(todo._id);
+                setSections(sections);
             }
+        } catch (error) {
+            setShowSectionsLoadingError(true);
+            console.error(error);
+        } finally {
+            setSectionsLoading(false);
         }
-
-        loadSections();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        loadSections();
+    }, [loadSections])
 
     async function deleteSection(section: SectionModel) {
         try {
@@ -97,7 +97,12 @@ const SectionLayout = ({ todo }: SectionLayoutProps) => {
             />}
 
             {sectionsLoading && <Spinner animation="border" variant="primary" />}
-            {showSectionsLoadingError && <p className="my-2"> Something went wrong loading sections for this todo.</p>}
+            {showSectionsLoadingError &&
+                <>
+                    <p className="my-2"> Something went wrong loading sections for this todo. Please try reloading.</p>
+                    <Button onClick={loadSections}> Reload</Button>
+                </>
+            }
 
             {!sectionsLoading && !showSectionsLoadingError &&
                 <>
