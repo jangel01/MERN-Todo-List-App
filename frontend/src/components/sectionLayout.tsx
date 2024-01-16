@@ -2,7 +2,7 @@ import { Section as SectionModel } from "../models/section";
 import { Todo as TodoModel } from "../models/todo";
 import { useEffect, useState } from "react";
 import * as SectionsApi from "../network/sections_api";
-import { Button, Col, Row } from "react-bootstrap";
+import { Button, Col, Row, Spinner } from "react-bootstrap";
 import sectionLayoutStyles from "../styles/sectionLayout.module.css";
 import Section from "./section";
 import AddEditSectionDialog from "./AddEditSectionDialog";
@@ -16,6 +16,8 @@ interface SectionLayoutProps {
 
 const SectionLayout = ({ todo }: SectionLayoutProps) => {
     const [sections, setSections] = useState<SectionModel[]>([]);
+    const [sectionsLoading, setSectionsLoading] = useState(true);
+    const [showSectionsLoadingError, setShowSectionsLoadingError] = useState(false);
     const [selectedSection, setSelectedSection] = useState<SectionModel | null>(null);
 
     const [showAddSectionDialog, setShowAddSectionDialog] = useState(false);
@@ -30,12 +32,17 @@ const SectionLayout = ({ todo }: SectionLayoutProps) => {
         async function loadSections() {
             try {
                 if (todo) {
+                    setShowSectionsLoadingError(false);
+                    setSectionsLoading(true);
+
                     const sections = await SectionsApi.fetchSections(todo._id);
                     setSections(sections);
                 }
             } catch (error) {
+                setShowSectionsLoadingError(true);
                 console.error(error);
-                alert(error);
+            } finally {
+                setSectionsLoading(false);
             }
         }
 
@@ -51,7 +58,7 @@ const SectionLayout = ({ todo }: SectionLayoutProps) => {
                 const updatedSections = sections.filter(existingSection => existingSection._id !== section._id)
 
                 const pageIndex = Math.ceil(updatedSections.length / maxSectionsPerPage);
-                
+
                 setSections(updatedSections);
                 setCurrentPage(pageIndex);
             }
@@ -60,10 +67,6 @@ const SectionLayout = ({ todo }: SectionLayoutProps) => {
             console.error(error);
             alert(error);
         }
-    }
-
-    const handlePaginationClick = (pageNumber: number) => {
-        setCurrentPage(pageNumber);
     }
 
     const handleSectionAdded = (newSection: SectionModel) => {
@@ -93,35 +96,45 @@ const SectionLayout = ({ todo }: SectionLayoutProps) => {
                 }}
             />}
 
-            {todo && <Button
-                variant="success"
-                className={`${styleUtils.blockCenter} ${styleUtils.flexCenter} my-3`}
-                onClick={() => setShowAddSectionDialog(true)}>
-                <FaPlus />
-                Section</Button>}
+            {sectionsLoading && <Spinner animation="border" variant="primary" />}
+            {showSectionsLoadingError && <p className="my-2"> Something went wrong loading sections for this todo.</p>}
 
-            {sections.length > 0 ? (
+            {!sectionsLoading && !showSectionsLoadingError &&
                 <>
-                    <Row xs={1} md={2} xl={3} className={`g-4 mx-0 ${sectionLayoutStyles.sectionGrid}`}>
-                        {currentSections.map((section) => (
-                            <Col key={section._id}>
-                                <Section
-                                    section={section}
-                                    onEditSectionIconClicked={setSelectedSection}
-                                    onDeleteSectionIconClicked={deleteSection} />
-                            </Col>
-                        ))}
-                    </Row>
+                    {todo && <Button
+                        variant="success"
+                        className={`${styleUtils.blockCenter} ${styleUtils.flexCenter} my-3`}
+                        onClick={() => setShowAddSectionDialog(true)}>
+                        <FaPlus />
+                        Section</Button>}
 
-                    <AdvancedPagination
-                        currentPage={currentPage}
-                        totalPages={Math.ceil(sections.length / maxSectionsPerPage)}
-                        onPageChange={(pageNumber) => handlePaginationClick(pageNumber)}
-                    />
+                    {
+                        sections.length > 0 ?
+                            <>
+                                <Row xs={1} md={2} xl={3} className={`g-4 mx-0 ${sectionLayoutStyles.sectionGrid}`}>
+                                    {currentSections.map((section) => (
+                                        <Col key={section._id}>
+                                            <Section
+                                                section={section}
+                                                onEditSectionIconClicked={setSelectedSection}
+                                                onDeleteSectionIconClicked={deleteSection} />
+                                        </Col>
+                                    ))}
+                                </Row>
+
+                                <AdvancedPagination
+                                    currentPage={currentPage}
+                                    totalPages={Math.ceil(sections.length / maxSectionsPerPage)}
+                                    onPageChange={(pageNumber) => setCurrentPage(pageNumber)}
+                                />
+                            </>
+                            :
+                            <>
+                                <p>Ready to get organized? Create a section for your todo!</p>
+                            </>
+                    }
                 </>
-            ) : (
-                <p>Ready to get organized? Create a section for your todo!</p>
-            )}
+            }
         </div>
     );
 }

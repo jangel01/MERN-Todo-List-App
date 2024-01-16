@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Todo as TodoModel } from './models/todo';
 import * as TodosApi from "./network/todos_api"
-import { Button, Container } from 'react-bootstrap';
+import { Button, Container, Spinner } from 'react-bootstrap';
 import TodoConfigure from './components/todoConfigure';
 import AddEditTodoDialog from './components/AddEditTodoDialog';
 import SectionLayout from './components/sectionLayout';
@@ -13,6 +13,9 @@ import { IoIosArrowForward } from "react-icons/io";
 
 function App() {
   const [todos, setTodos] = useState<TodoModel[]>([]);
+  const [todosLoading, setTodosLoading] = useState(true);
+  const [showTodosLoadingError, setShowTodosLoadingError] = useState(false);
+
   const [selectedTodo, setSelectedTodo] = useState<TodoModel | null>(null);
   const [currentTodoIndex, setCurrentTodoIndex] = useState<number>(0);
 
@@ -22,16 +25,20 @@ function App() {
   useEffect(() => {
     async function loadTodos() {
       try {
+        setShowTodosLoadingError(false);
+        setTodosLoading(true);
+
         const todos = await TodosApi.fetchTodos();
         setTodos(todos);
 
         if (todos.length > 0) {
           setSelectedTodo(todos[0]);
         }
-
       } catch (error) {
         console.error(error);
-        alert(error);
+        setShowTodosLoadingError(true);
+      } finally {
+        setTodosLoading(false);
       }
     }
 
@@ -104,42 +111,49 @@ function App() {
       />}
 
       <Container className={appStyles.pageContainer}>
-        {todos.length > 0 ? (
+        {todosLoading && <Spinner animation='border' variant='primary' />}
+        {showTodosLoadingError && <p className='my-2'>Something went wrong loading todos. Please refresh the page.</p>}
+
+        {!todosLoading && !showTodosLoadingError &&
           <>
-            <TodoConfigure
-              selectedTodo={selectedTodo}
-              todos={todos}
-              onSelect={(todo) => updateCurrentTodoIndex(todo)}
-              onNewTodoClicked={() => setShowAddTodoDialog(true)}
-              onEditTodoClicked={() => setShowEditTodoDialog(true)}
-            />
+            {todos.length > 0 ?
+              <>
+                <TodoConfigure
+                  selectedTodo={selectedTodo}
+                  todos={todos}
+                  onSelect={(todo) => updateCurrentTodoIndex(todo)}
+                  onNewTodoClicked={() => setShowAddTodoDialog(true)}
+                  onEditTodoClicked={() => setShowEditTodoDialog(true)}
+                />
 
-            <h1 className="py-2" style={{ wordWrap: 'break-word' }}>{selectedTodo?.todoName}</h1>
+                <h1 className="py-2" style={{ wordWrap: 'break-word' }}>{selectedTodo?.todoName}</h1>
 
-            <IoIosArrowBack 
-            onClick={handleBackClick}
-            style={{fontSize: "1.5rem"}} 
-            className={currentTodoIndex === 0 ? `${styleUtils.lighterIcon}` : `${styleUtils.cursorPointer}`} />
+                <IoIosArrowBack
+                  onClick={handleBackClick}
+                  style={{ fontSize: "1.5rem" }}
+                  className={currentTodoIndex === 0 ? `${styleUtils.lighterIcon}` : `${styleUtils.cursorPointer}`} />
 
-            <IoIosArrowForward 
-            onClick={handleForwardClick}
-            style={{fontSize: "1.5rem"}} 
-            className={currentTodoIndex === todos.length - 1 ? `${styleUtils.lighterIcon}` : `${styleUtils.cursorPointer}`} />
+                <IoIosArrowForward
+                  onClick={handleForwardClick}
+                  style={{ fontSize: "1.5rem" }}
+                  className={currentTodoIndex === todos.length - 1 ? `${styleUtils.lighterIcon}` : `${styleUtils.cursorPointer}`} />
 
-            <SectionLayout todo={selectedTodo} key={selectedTodo?._id} />
+                <SectionLayout todo={selectedTodo} key={selectedTodo?._id} />
+              </>
+              :
+              <>
+                <p>You have no todos. Go ahead and create one.</p>
+                <Button
+                  variant="secondary"
+                  className={`${styleUtils.blockCenter} ${styleUtils.flexCenter}`}
+                  onClick={() => setShowAddTodoDialog(true)}>
+                  <FaPlus />
+                  Todo
+                </Button>
+              </>
+            }
           </>
-        ) : (
-          <>
-            <p>You have no todos. Go ahead and create one.</p>
-            <Button
-              variant="secondary"
-              className={`${styleUtils.blockCenter} ${styleUtils.flexCenter}`}
-              onClick={() => setShowAddTodoDialog(true)}>
-              <FaPlus />
-              Todo
-            </Button>
-          </>
-        )}
+        }
       </Container>
     </div>
   );

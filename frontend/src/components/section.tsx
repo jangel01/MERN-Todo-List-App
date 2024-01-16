@@ -1,4 +1,4 @@
-import { Card } from "react-bootstrap";
+import { Card, Spinner } from "react-bootstrap";
 import { Section as SectionModel } from "../models/section";
 import { Task as TaskModel } from "../models/task";
 import sectionLayoutStyles from "../styles/sectionLayout.module.css";
@@ -21,6 +21,8 @@ interface SectionProps {
 
 const Section = ({ section, onEditSectionIconClicked, onDeleteSectionIconClicked }: SectionProps) => {
     const [tasks, setTasks] = useState<TaskModel[]>([]);
+    const [tasksLoading, setTasksLoading] = useState(true);
+    const [showTasksLoadingError, setShowTasksLoadingError] = useState(false);
 
     const [showAddEditTaskDialog, setShowAddEditTaskDialog] = useState(false);
     const [selectedTask, setSelectedTask] = useState<TaskModel | null>(null);
@@ -29,18 +31,21 @@ const Section = ({ section, onEditSectionIconClicked, onDeleteSectionIconClicked
         async function loadTasks() {
             try {
                 if (section) {
+                    setTasksLoading(true);
+                    setShowTasksLoadingError(false);
                     const tasks = await TasksApi.fetchTasks(section._id);
                     setTasks(tasks);
                 }
-
             } catch (error) {
+                setShowTasksLoadingError(true);
                 console.error(error);
-                alert(error);
+            } finally {
+                setTasksLoading(false);
             }
         }
 
         loadTasks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const onUpdateTaskStatus = async (task: TaskModel, taskCompleted: TaskStatusInput) => {
@@ -104,27 +109,39 @@ const Section = ({ section, onEditSectionIconClicked, onDeleteSectionIconClicked
                         </div>
                     </Card.Title>
 
-                    <div className="d-flex my-2">
-                        <FaPlus className={`${styleUtils.cursorPointer} ml-auto`} onClick={() => setShowAddEditTaskDialog(true)} />
-                    </div>
+                    {tasksLoading && <Spinner animation="border" variant="primary" />}
+                    {showTasksLoadingError && <p className="py-3">Something went wrong loading tasks for this section.</p>}
 
-                    {tasks.length > 0 ? (
-                        <div className="overflow-auto py-2" style={{ maxHeight: "6.25rem" }}>
-                            {tasks.map((task) => (
-                                <Task
-                                    task={task}
-                                    key={task._id}
-                                    onUpdateTaskDescription={setSelectedTask}
-                                    onUpdateTaskStatus={onUpdateTaskStatus} />
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="py-2">This section looks a bit lonely. How about adding a task?</p>
-                    )}
-                    
+                    {!tasksLoading && !showTasksLoadingError &&
+                        <>
+                            <div className="d-flex my-2">
+                                <FaPlus className={`${styleUtils.cursorPointer} ml-auto`} onClick={() => setShowAddEditTaskDialog(true)} />
+                            </div>
+
+                            {tasks.length > 0 ?
+                                <>
+
+                                    <div className="overflow-auto py-2" style={{ maxHeight: "6.25rem" }}>
+                                        {tasks.map((task) => (
+                                            <Task
+                                                task={task}
+                                                key={task._id}
+                                                onUpdateTaskDescription={setSelectedTask}
+                                                onUpdateTaskStatus={onUpdateTaskStatus} />
+                                        ))}
+                                    </div>
+                                </>
+                                :
+                                <>
+                                    <p className="py-2">This section looks a bit lonely. How about adding a task?</p>
+
+                                </>
+                            }
+                        </>
+                    }
                 </Card.Body>
             </Card >
-        </div>
+        </div >
 
     );
 }

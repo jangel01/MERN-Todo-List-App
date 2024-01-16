@@ -7,7 +7,7 @@ import { RequestHandler } from "express";
 export const getTasks: RequestHandler = async (req, res, next) => {
     const sectionId = req.params.sectionId;
 
-    try {
+    try {        
         if (!mongoose.isValidObjectId(sectionId)) {
             throw createHttpError(400, "Error: Invalid section id specified");
         }

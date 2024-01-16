@@ -52,6 +52,7 @@ const AddEditTaskDialog = ({ sectionId, taskToEdit, onDismiss, onTaskSaved, onDe
                         type="text"
                         placeholder="Task"
                         register={register}
+                        registerOptions ={{required: "Required"}}
                         error={errors.taskDescription}
                     />
                 </Form>
