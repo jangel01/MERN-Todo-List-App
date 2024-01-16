@@ -10,6 +10,8 @@ import styleUtils from "./styles/utils.module.css";
 import { FaPlus } from "react-icons/fa";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [todos, setTodos] = useState<TodoModel[]>([]);
@@ -160,6 +162,8 @@ function App() {
           </>
         }
       </Container>
+
+      <ToastContainer position='top-center'/>
     </div>
   );
 };

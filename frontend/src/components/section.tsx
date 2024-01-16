@@ -12,6 +12,7 @@ import { FaPlus } from "react-icons/fa";
 import styleUtils from "../styles/utils.module.css";
 import AddEditTaskDialog from "./AddEditTaskDialog";
 import Task from "./task";
+import { toast } from "react-toastify";
 
 interface SectionProps {
     section: SectionModel,
@@ -56,7 +57,7 @@ const Section = ({ section, onEditSectionIconClicked, onDeleteSectionIconClicked
 
         } catch (error) {
             console.error(error);
-            alert(error);
+            toast.error("Failed to update task status. Please try again.");
         }
     };
 

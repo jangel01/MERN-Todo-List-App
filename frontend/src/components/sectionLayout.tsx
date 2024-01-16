@@ -9,6 +9,7 @@ import AddEditSectionDialog from "./AddEditSectionDialog";
 import styleUtils from "../styles/utils.module.css";
 import { FaPlus } from "react-icons/fa";
 import AdvancedPagination from "./AdvancedPagination";
+import { toast } from "react-toastify";
 
 interface SectionLayoutProps {
     todo: TodoModel | null,
@@ -65,7 +66,7 @@ const SectionLayout = ({ todo }: SectionLayoutProps) => {
 
         } catch (error) {
             console.error(error);
-            alert(error);
+            toast.error("Failed to delete section. Please try again or refresh the sections.");
         }
     }
 
