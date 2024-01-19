@@ -1,6 +1,6 @@
 const TodosPageLoggedOutView = () => {
     return ( 
-        <p>Please log in to see your todos.</p>
+        <p>Please sign up or log in to see your todos.</p>
      );
 }
  

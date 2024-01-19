@@ -1,9 +1,9 @@
-import * as TaskInterfaces from "../interfaces/task";
-import createHttpError from "http-errors";
-import {TaskModel} from "../models/models";
 import { RequestHandler } from "express";
-import { validateFetchSection, validateFetchTask } from "../util/validateId";
+import createHttpError from "http-errors";
+import * as TaskInterfaces from "../interfaces/task";
+import { TaskModel } from "../models/models";
 import { assertIsDefined } from "../util/assertIsDefined";
+import { validateFetchSection, validateFetchTask } from "../util/validateId";
 
 export const getTasks: RequestHandler = async (req, res, next) => {
     const sectionId = req.params.sectionId;

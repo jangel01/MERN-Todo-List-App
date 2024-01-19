@@ -1,15 +1,17 @@
-import { Container } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import LoginModal from './components/LoginModal';
 import NavBar from './components/NavBar';
-import appStyles from './styles/App.module.css';
-import { useEffect, useState } from 'react';
+import SignUpModal from './components/SignUpModal';
 import { User as UserModel } from './models/user';
 import * as UsersApi from "./network/users_api";
-import SignUpModal from './components/SignUpModal';
-import LoginModal from './components/LoginModal';
-import TodosPageLoggedInView from './components/TodosPageLoggedInView';
-import TodosPageLoggedOutView from './components/TodosPageLoggedOutView';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Container } from 'react-bootstrap';
+import TodosPage from './pages/TodosPage';
+import PrivacyPage from './pages/PrivacyPage';
+import NotFoundPage from './pages/NotFoundPage';
+import appStyles from './styles/App.module.css';
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState<UserModel | null>(null);
@@ -31,43 +33,45 @@ function App() {
   }, []);
 
   return (
-    <div>
-      {showSignUpModal &&
-        <SignUpModal
-          onDismiss={() => setShowSignUpModal(false)}
-          onSignUpSuccessful={(user) => {
-            setLoggedInUser(user)
-            setShowSignUpModal(false);
-          }
-          }
-        />
-      }
-
-      {showLoginModal &&
-        <LoginModal
-          onDismiss={() => setShowLoginModal(false)}
-          onLoginSuccessful={(user) => {
-            setLoggedInUser(user)
-            setShowLoginModal(false);
-          }
-          }
-        />
-      }
-
-      <NavBar loggedInUser={loggedInUser}
-        onSignUpClicked={() => setShowSignUpModal(true)}
-        onLoginClicked={() => setShowLoginModal(true)}
-        onLogoutSuccessful={() => setLoggedInUser(null)} />
-
-      <Container className={appStyles.pageContainer}>
-        {loggedInUser ?
-          <TodosPageLoggedInView />
-          :
-          <TodosPageLoggedOutView />
+    <BrowserRouter>
+      <div>
+        {showSignUpModal &&
+          <SignUpModal
+            onDismiss={() => setShowSignUpModal(false)}
+            onSignUpSuccessful={(user) => {
+              setLoggedInUser(user)
+              setShowSignUpModal(false);
+            }
+            }
+          />
         }
-      </Container>
-      <ToastContainer position='top-center' />
-    </div>
+
+        {showLoginModal &&
+          <LoginModal
+            onDismiss={() => setShowLoginModal(false)}
+            onLoginSuccessful={(user) => {
+              setLoggedInUser(user)
+              setShowLoginModal(false);
+            }
+            }
+          />
+        }
+
+        <NavBar loggedInUser={loggedInUser}
+          onSignUpClicked={() => setShowSignUpModal(true)}
+          onLoginClicked={() => setShowLoginModal(true)}
+          onLogoutSuccessful={() => setLoggedInUser(null)} />
+
+        <Container className={appStyles.pageContainer}>
+          <Routes>
+            <Route path='/' element={<TodosPage loggedInUser={loggedInUser} />} />
+            <Route path='/privacy' element ={<PrivacyPage/>}/>
+            <Route path='/*' element={<NotFoundPage/>}/>
+          </Routes>
+        </Container>
+        <ToastContainer position='top-center' />
+      </div>
+    </BrowserRouter>
   );
 };
 
