@@ -9,6 +9,7 @@ import userRoutes from "./routes/users";
 import session from "express-session";
 import env from "./util/validateEnv";
 import MongoStore from "connect-mongo";
+import { requiresAuth } from "./middleware/auth";
 
 const app = express();
 
@@ -29,10 +30,10 @@ app.use(session({
     }),
 }));
 
-app.use("/api/todos", todosRoutes);
-app.use("/api/sections", sectionsRoutes);
-app.use("/api/tasks", tasksRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/todos", requiresAuth, todosRoutes);
+app.use("/api/sections", requiresAuth, sectionsRoutes);
+app.use("/api/tasks", requiresAuth, tasksRoutes);
 
 app.use((req, res, next) => {
     next(createHttpError(404, "Endpoint not found"));

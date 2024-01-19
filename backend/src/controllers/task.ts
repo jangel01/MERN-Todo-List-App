@@ -1,24 +1,20 @@
 import * as TaskInterfaces from "../interfaces/task";
 import createHttpError from "http-errors";
-import mongoose from "mongoose";
-import {SectionModel, TaskModel} from "../models/models";
+import {TaskModel} from "../models/models";
 import { RequestHandler } from "express";
+import { validateFetchSection, validateFetchTask } from "../util/validateId";
+import { assertIsDefined } from "../util/assertIsDefined";
 
 export const getTasks: RequestHandler = async (req, res, next) => {
     const sectionId = req.params.sectionId;
+    const authenticatedUserId = req.session.userId;
 
-    try {        
-        if (!mongoose.isValidObjectId(sectionId)) {
-            throw createHttpError(400, "Error: Invalid section id specified");
-        }
+    try {
+        assertIsDefined(authenticatedUserId);
+        
+        await validateFetchSection(sectionId, authenticatedUserId);
 
-        const section = await SectionModel.findById(sectionId).exec();
-
-        if (!section) {
-            throw createHttpError(404, "Error: Can not fetch tasks -- section does not exist");
-        }
-
-        const tasks = await TaskModel.find({sectionId: sectionId}).exec();
+        const tasks = await TaskModel.find({userId: authenticatedUserId, sectionId: sectionId}).exec();
 
         res.status(200).json(tasks);
     } catch (error) {
@@ -29,17 +25,14 @@ export const getTasks: RequestHandler = async (req, res, next) => {
 export const getTask: RequestHandler = async (req, res, next) => {
     const taskId = req.params.taskId;
     const sectionId = req.body.sectionId;
+    const authenticatedUserId = req.session.userId;
 
     try {
-        if (!mongoose.isValidObjectId(sectionId) || !mongoose.isValidObjectId(taskId)) {
-            throw createHttpError(400, "Error: Invalid section or task id specified");
-        }
+        assertIsDefined(authenticatedUserId);
 
-        const task = await TaskModel.findOne({ _id: taskId, sectionId: sectionId}).exec();
+        await validateFetchSection(sectionId, authenticatedUserId);
 
-        if (!task) {
-            throw createHttpError(404, "Error: Task not found");
-        }
+        const task = await validateFetchTask(taskId, authenticatedUserId, sectionId);
 
         res.status(200).json(task);
     } catch (error) {
@@ -50,23 +43,19 @@ export const getTask: RequestHandler = async (req, res, next) => {
 export const createTask: RequestHandler<unknown, unknown, TaskInterfaces.CreateTaskBody, unknown> = async (req, res, next) => {
     const taskDescription = req.body.taskDescription;
     const sectionId = req.body.sectionId;
+    const authenticatedUserId = req.session.userId;
 
     try {
-        if (!mongoose.isValidObjectId(sectionId)) {
-            throw createHttpError(400, "Error: Invalid section id specified");
-        }
+        assertIsDefined(authenticatedUserId);
 
         if (!taskDescription) {
-            throw createHttpError(400, "Error: Task must have a description");
+            throw createHttpError(400, "Task must have a description");
         }
 
-        const section = await SectionModel.findById(sectionId).exec();
-
-        if (!section) {
-            throw createHttpError(404, "Error: Can not create task -- section not found");
-        }
+        await validateFetchSection(sectionId, authenticatedUserId);
 
         const newTask = await TaskModel.create({
+            userId: authenticatedUserId,
             taskDescription: taskDescription,
             taskCompleted: false,
             sectionId: sectionId,
@@ -82,38 +71,24 @@ export const updateTaskName: RequestHandler<TaskInterfaces.UpdateTaskNameParams,
     const taskId = req.params.taskId;
     const taskDescription = req.body.taskDescription;
     const sectionId = req.body.sectionId;
+    const authenticatedUserId = req.session.userId;
 
     try {
-        if (!mongoose.isValidObjectId(sectionId) || !mongoose.isValidObjectId(taskId)) {
-            throw createHttpError(400, "Error: Invalid section or task id specified");
-        }
+        assertIsDefined(authenticatedUserId);
 
         if (!taskDescription) {
             throw createHttpError(400, "Error: Task must have a description");
         }
 
-        const section = await SectionModel.findById(sectionId).exec();
+        await validateFetchSection(sectionId, authenticatedUserId);
 
-        if (!section) {
-            throw createHttpError(404, "Error: Can not update task name -- section not found");
-        }
-
-        const taskToUpdate = await TaskModel.findById(taskId).exec();
-
-        if (!taskToUpdate) {
-            throw createHttpError(404, "Error: Task not found");
-        }
-
-        if (taskToUpdate.sectionId.toString() !== sectionId) {
-            throw createHttpError(400, "Error: The specified sectionId does not match the sectionId associated with the task");
-        }
+        const taskToUpdate = await validateFetchTask(taskId, authenticatedUserId, sectionId);
 
         taskToUpdate.taskDescription = taskDescription;
 
         const updatedTask = await taskToUpdate.save();
 
         res.status(200).json(updatedTask);
-
     } catch (error) {
         next(error);
     }
@@ -123,38 +98,24 @@ export const updateTaskStatus: RequestHandler<TaskInterfaces.UpdateTaskStatusPar
     const taskId = req.params.taskId;
     const taskCompleted = req.body.taskCompleted;
     const sectionId = req.body.sectionId;
+    const authenticatedUserId = req.session.userId;
 
     try {
-        if (!mongoose.isValidObjectId(sectionId) || !mongoose.isValidObjectId(taskId)) {
-            throw createHttpError(400, "Error: Invalid section or task id specified");
-        }
+        assertIsDefined(authenticatedUserId);
 
         if (taskCompleted === undefined) {
             throw createHttpError(404, "Error: Can not update task status -- boolean is undefined");
         }
 
-        const section = await SectionModel.findById(sectionId).exec();
+        await validateFetchSection(sectionId, authenticatedUserId);
 
-        if (!section) {
-            throw createHttpError(404, "Error: Can not update task -- section not found");
-        }
-
-        const taskToUpdate = await TaskModel.findById(taskId).exec();
-
-        if (!taskToUpdate) {
-            throw createHttpError(404, "Error: Task not found");
-        }
-
-        if (taskToUpdate.sectionId.toString() !== sectionId) {
-            throw createHttpError(400, "Error: The specified sectionId does not match the sectionId associated with the task");
-        }
+        const taskToUpdate = await validateFetchTask(taskId, authenticatedUserId, sectionId);
 
         taskToUpdate.taskCompleted = taskCompleted;
 
         const updatedTask = await taskToUpdate.save();
 
         res.status(200).json(updatedTask);
-
     } catch (error) {
         next(error);
     }
@@ -163,28 +124,18 @@ export const updateTaskStatus: RequestHandler<TaskInterfaces.UpdateTaskStatusPar
 export const deleteTask: RequestHandler = async (req, res, next) => {
     const taskId = req.params.taskId;
     const sectionId = req.body.sectionId;
+    const authenticatedUserId = req.session.userId;
 
     try {
-        if (!mongoose.isValidObjectId(sectionId) || !mongoose.isValidObjectId(taskId)) {
-            throw createHttpError(400, "Error: Invalid id specified");
-        }
+        assertIsDefined(authenticatedUserId);
 
-        const section = await SectionModel.findById(sectionId).exec();
+        await validateFetchSection(sectionId, authenticatedUserId);
 
-        if (!section) {
-            throw createHttpError(404, "Error: Can not delete task -- section not found");
-        }
-
-        const taskToDelete = await TaskModel.findById(taskId).exec();
-
-        if (!taskToDelete) {
-            throw createHttpError(404, "Error: Can not delete task -- task not found");
-        }
+        const taskToDelete = await validateFetchTask(taskId, authenticatedUserId, sectionId);
 
         await taskToDelete.deleteOne();
 
         res.sendStatus(204);
-
     } catch (error) {
         next(error);
     }

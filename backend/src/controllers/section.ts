@@ -1,24 +1,19 @@
 import { RequestHandler } from "express";
-import createHttpError from "http-errors";
-import mongoose from "mongoose";
-import {SectionModel, TodoModel, TaskModel} from "../models/models";
+import {SectionModel, TaskModel} from "../models/models";
 import * as SectionInterfaces from "../interfaces/section";
+import { assertIsDefined } from "../util/assertIsDefined";
+import { validateFetchSection, validateFetchTodo } from "../util/validateId";
 
 export const getSections: RequestHandler = async (req, res, next) => {
     const todoId = req.params.todoId;
+    const authenticatedUserId = req.session.userId;
 
     try {
-        if (!mongoose.isValidObjectId(todoId)) {
-            throw createHttpError(400, "Error: Invalid todo id specified");
-        }
+        assertIsDefined(authenticatedUserId);
 
-        const todo = await TodoModel.findById(todoId).exec();
+        await validateFetchTodo(todoId, authenticatedUserId);
 
-        if (!todo) {
-            throw createHttpError(404, "Error: Can not fetch sections -- todo does not exist");
-        }
-
-        const sections = await SectionModel.find({todoId : todoId}).exec();
+        const sections = await SectionModel.find({userId: authenticatedUserId, todoId : todoId}).exec();
 
         res.status(200).json(sections);
     } catch (error) {
@@ -29,17 +24,14 @@ export const getSections: RequestHandler = async (req, res, next) => {
 export const getSection: RequestHandler = async (req, res, next) => {
     const sectionId = req.params.sectionId;
     const todoId = req.body.todoId;
+    const authenticatedUserId = req.session.userId;
 
     try {
-        if (!mongoose.isValidObjectId(todoId) || !mongoose.isValidObjectId(sectionId)) {
-            throw createHttpError(400, "Error: Invalid todo or section id specified");
-        }
+        assertIsDefined(authenticatedUserId);
 
-        const section = await SectionModel.findOne({ _id: sectionId, todoId: todoId }).exec();
+        await validateFetchTodo(todoId, authenticatedUserId);
 
-        if (!section) {
-            throw createHttpError(404, "Error: Section not found");
-        }
+        const section = await validateFetchSection(sectionId, authenticatedUserId, todoId);
 
         res.status(200).json(section);
     } catch (error) {
@@ -50,23 +42,19 @@ export const getSection: RequestHandler = async (req, res, next) => {
 export const createSection: RequestHandler<unknown, unknown, SectionInterfaces.CreateSectionBody, unknown> = async (req, res, next) => {
     const todoId = req.body.todoId;
     let sectionName = req.body.sectionName;
+    const authenticatedUserId = req.session.userId;
 
     try {
-        if (!mongoose.isValidObjectId(todoId)) {
-            throw createHttpError(400, "Error: Invalid todo id specified");
-        }
+        assertIsDefined(authenticatedUserId);
+
+        await validateFetchTodo(todoId, authenticatedUserId);
 
         if (!sectionName) {
             sectionName = "Unnamed section";
         }
 
-        const todo = await TodoModel.findById(todoId).exec();
-
-        if (!todo) {
-            throw createHttpError(404, "Error: Can not create section -- todo not found");
-        }
-
         const newSection = await SectionModel.create({
+            userId: authenticatedUserId,
             sectionName: sectionName,
             todoId: todoId,
         });
@@ -79,34 +67,20 @@ export const createSection: RequestHandler<unknown, unknown, SectionInterfaces.C
 
 export const updateSection: RequestHandler<SectionInterfaces.UpdateSectionParams, unknown, SectionInterfaces.UpdateSectionBody, unknown> = async (req, res, next) => {
     const sectionId = req.params.sectionId;
-
     let sectionName = req.body.sectionName;
     const todoId = req.body.todoId;
+    const authenticatedUserId = req.session.userId;
 
     try {
-        if (!mongoose.isValidObjectId(todoId) || !mongoose.isValidObjectId(sectionId)) {
-            throw createHttpError(400, "Error: Invalid todo or section id specified");
-        }
+        assertIsDefined(authenticatedUserId);
 
         if (!sectionName) {
             sectionName = "Unnamed section";
         }
 
-        const todo = await TodoModel.findById(todoId).exec();
+        await validateFetchTodo(todoId, authenticatedUserId);
 
-        if (!todo) {
-            throw createHttpError(404, "Error: Can not update section -- todo not found");
-        }
-
-        const sectionToUpdate = await SectionModel.findById(sectionId).exec();
-
-        if (!sectionToUpdate) {
-            throw createHttpError(404, "Error: Section not found");
-        }
-
-        if (sectionToUpdate.todoId.toString() !== todoId) {
-            throw createHttpError(400, "Error: The specified todoId does not match the todoId associated with the section");
-        }
+        const sectionToUpdate = await validateFetchSection(sectionId, authenticatedUserId, todoId);
 
         sectionToUpdate.sectionName = sectionName;
 
@@ -120,36 +94,21 @@ export const updateSection: RequestHandler<SectionInterfaces.UpdateSectionParams
 
 export const deleteSection: RequestHandler = async (req, res, next) => {
     const sectionId = req.params.sectionId;
-
     const todoId = req.body.todoId;
+    const authenticatedUserId = req.session.userId;
 
     try {
-        if (!mongoose.isValidObjectId(todoId) || !mongoose.isValidObjectId(sectionId)) {
-            throw createHttpError(400, "Error: Invalid todo or section id specified");
-        }
+        assertIsDefined(authenticatedUserId);
 
-        const todo = await TodoModel.findById(todoId).exec();
+        await validateFetchTodo(todoId, authenticatedUserId);
 
-        if (!todo) {
-            throw createHttpError(404, "Error: Can not delete section -- todo not found");
-        }
-
-        const sectionToDelete = await SectionModel.findById(sectionId).exec();
-
-        if (!sectionToDelete) {
-            throw createHttpError(404, "Error: Can not delete section -- section not found");
-        }
-
-        if (sectionToDelete.todoId.toString() !== todoId) {
-            throw createHttpError(400, "Error: The specified todoId does not match the todoId associated with the section");
-        }
+        const sectionToDelete = await validateFetchSection(sectionId, authenticatedUserId, todoId);
 
         await TaskModel.deleteMany({ sectionId: sectionId });
 
         await sectionToDelete.deleteOne();
 
         res.sendStatus(204);
-
     } catch (error) {
         next(error);
     }
