@@ -2,9 +2,11 @@ import { useForm } from "react-hook-form";
 import { User as UserModel } from "../models/user";
 import { SignupCredentials } from "../network/interfaces/user";
 import * as UsersApi from "../network/users_api";
-import { Button, Form, Modal } from "react-bootstrap";
+import { Alert, Button, Form, Modal } from "react-bootstrap";
 import TextInputField from "./form/TextInputField";
 import styleUtils from "../styles/utils.module.css";
+import { useState } from "react";
+import { ConflictError } from "../errors/http_errors";
 
 interface SignUpModalProps {
     onDismiss: () => void,
@@ -12,6 +14,8 @@ interface SignUpModalProps {
 }
 
 const SignUpModal = ({ onDismiss, onSignUpSuccessful }: SignUpModalProps) => {
+    const [errorText, setErrorText] = useState<string | null>(null);
+
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignupCredentials>();
 
     async function onSubmit(credentials: SignupCredentials) {
@@ -19,7 +23,12 @@ const SignUpModal = ({ onDismiss, onSignUpSuccessful }: SignUpModalProps) => {
             const newUser = await UsersApi.signUp(credentials);
             onSignUpSuccessful(newUser);
         } catch (error) {
-            alert(error);
+            if (error instanceof ConflictError) {
+                setErrorText(error.message);
+            } else {
+                alert(error);
+            }
+
             console.error(error);
         }
     }
@@ -33,6 +42,12 @@ const SignUpModal = ({ onDismiss, onSignUpSuccessful }: SignUpModalProps) => {
             </Modal.Header>
 
             <Modal.Body>
+                {errorText &&
+                    <Alert variant="danger">
+                        {errorText}
+                    </Alert>
+                }
+                
                 <Form onSubmit={handleSubmit(onSubmit)}>
                     <TextInputField
                         name="username"
@@ -63,7 +78,7 @@ const SignUpModal = ({ onDismiss, onSignUpSuccessful }: SignUpModalProps) => {
                         registerOptions={{ required: "Required" }}
                         error={errors.password}
                     />
-                    
+
                     <Button type="submit" disabled={isSubmitting} className={styleUtils.width100}>
                         Sign Up
                     </Button>
